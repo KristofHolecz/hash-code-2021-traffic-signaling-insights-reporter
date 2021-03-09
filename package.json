@@ -1,0 +1,28 @@
+{
+  "name": "hash-code-2021-traffic-signaling-insights-reporter",
+  "version": "1.0.0",
+  "description": "Referee and insights reporter for Google Hash Code 2021 Qualification Round (Traffic Signaling)",
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [
+    "google",
+    "hashcode",
+    "hash code",
+    "qualification round",
+    "traffic signaling",
+    "referee",
+    "insights",
+    "reporter"
+  ],
+  "homepage": "https://github.com/KristofHolecz/hash-code-2021-traffic-signaling-insights-reporter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KristofHolecz/hash-code-2021-traffic-signaling-insights-reporter.git"
+  },
+  "author": "Kristóf Holecz",
+  "license": "ISC"
+}
