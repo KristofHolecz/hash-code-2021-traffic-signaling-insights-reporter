@@ -6,7 +6,7 @@ Referee and insights reporter for [Google Hash Code 2021 Qualification Round (Tr
 
 The input data set and the submission file(s) need to be placed in the same folder with the following naming convention:
 
-Input data set: `a.txt`
+Input data set: `a.txt` \
 Submission: `a.txt.out.txt`
 
 Evaluate the submission and print the insights to stdout:
@@ -18,7 +18,7 @@ $ node index.js data/a.txt
 Evaluate the submission and write the insights to file (it creates a file called `a.txt.insights.txt` and will not print anything to stdout):
 
 ```bash
-$ node index.js data/a.txt 0
+$ node index.js data/a.txt 1
 ```
 
 Having trouble using the referee and insights reporter, just drop the following line into the CLI.

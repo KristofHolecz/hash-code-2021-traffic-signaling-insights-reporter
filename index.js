@@ -4,16 +4,16 @@ const {
   readInput, writeOutput, getMemoryUsageMessage, elapsedTime, parseLine
 } = require('./utils');
 
-const [filePath, outputToStdout = 1, debug = 0] = process.argv.slice(2);
+const [filePath, outputToFile = 0, debug = 0] = process.argv.slice(2);
 
-if (!filePath || isNaN(outputToStdout) || isNaN(debug)) {
+if (!filePath || isNaN(outputToFile) || isNaN(debug)) {
   console.info(`Usage:
-  node index.js <input-file-path> [output-to-stdout] [debug]
+  node index.js <input-file-path> [output-to-file] [debug]
 
 Options:
-  input-file-path   The path of the input data set.
-  output-to-stdout  Write the insights to stdout (1) or file (0) [default: 1].
-  debug             Write memory usage and elapsed time information to stdout [default: 0].
+  input-file-path  The path of the input data set.
+  output-to-file   Write the insights to stdout (0) or file (1) [default: 0].
+  debug            Write memory usage and elapsed time information to stdout [default: 0].
 
 Examples:
   node index.js data/a.txt
@@ -21,7 +21,7 @@ Examples:
     with its submission (data/a.txt.out.txt) then evaluate and
     print the insights to the stdout.
 
-  node index.js data/d.txt 0
+  node index.js data/d.txt 1
     This will parse the given input data set (data/d.txt)
     with its submission (data/d.txt.out.txt) then evaluate and
     create a file (data/d.txt.insights.txt) containing insights.
@@ -234,7 +234,7 @@ function simulate() {
 }
 
 function createInsights() {
-  const noColor = +outputToStdout === 0;
+  const noColor = +outputToFile === 1;
   const yellow = value => noColor ? value : `\u001B[33m${value}\u001B[0m`;
   const formatNumber = value => yellow(value.toLocaleString('en-US'));
   const toPercentage = value => yellow(`${(value * 100).toFixed(0)}%`);
@@ -297,7 +297,7 @@ function evaluate([inputDataSet, submittedDataSet]) {
 
 Promise.all([readInput(filePath), readInput(`${filePath}.out.txt`)])
   .then(evaluate)
-  .then(output => +outputToStdout
+  .then(output => !+outputToFile
     ? (console.info(output), Promise.resolve())
     : writeOutput(`${filePath}.insights.txt`, output)
   )
