@@ -41,7 +41,6 @@ const dataset = {
   streets: {},
   cars: [],
 };
-const intersectionSchedulesById = {};
 const averageIntersectionSchedules = {
   greenCycles: 0,
   totalCycles: 0,
@@ -74,6 +73,7 @@ function parseInputDataSet(data) {
       numStreets: carNumStreets,
       streetNames,
       currentStreetIdx: 0,
+      currentStreetName: streetNames[0],
       remainingTimeOnStreet: 0,
       queuingNumber: dataset.streets[streetNames[0]].nextQueuingNumber++,
       arrived: false,
@@ -86,6 +86,7 @@ function parseInputDataSet(data) {
 function parseSubmittedDataSet(data) {
   const lines = data.split('\n');
   const numIntersections = +lines.shift();
+  const intersectionSchedulesById = {};
   let numSchedules = 0;
   let currentLine = 0;
 
@@ -112,9 +113,10 @@ function parseSubmittedDataSet(data) {
       );
     }
 
-    intersectionSchedulesById[intersectionId] = {};
+    intersectionSchedulesById[intersectionId] = true;
     numSchedules += +numIncomingStreets;
 
+    const streetNames = [];
     let lastScheduleTime = 0;
 
     for (let j = 0; j < +numIncomingStreets; j++) {
@@ -145,14 +147,18 @@ function parseSubmittedDataSet(data) {
         ].join(' '));
       }
 
-      intersectionSchedulesById[intersectionId][streetName] = {
+      dataset.streets[streetName].schedule = {
         gte: lastScheduleTime,
         lte: lastScheduleTime + schedule - 1
       };
+      streetNames.push(streetName);
       lastScheduleTime += schedule;
     }
 
-    intersectionSchedulesById[intersectionId].scheduledTimeWindow = lastScheduleTime;
+    for (const streetName of streetNames) {
+      dataset.streets[streetName].scheduledTimeWindow = lastScheduleTime;
+    }
+
     averageIntersectionSchedules.totalCycles += lastScheduleTime;
     currentLine += +numIncomingStreets + 1;
   }
@@ -177,9 +183,7 @@ function simulate() {
         car.remainingTimeOnStreet === 1 &&
         car.currentStreetIdx < car.numStreets - 1
       ) {
-        const streetName = car.streetNames[car.currentStreetIdx];
-
-        car.queuingNumber = dataset.streets[streetName].nextQueuingNumber++;
+        car.queuingNumber = dataset.streets[car.currentStreetName].nextQueuingNumber++;
       }
 
       if (car.remainingTimeOnStreet > 0) {
@@ -198,15 +202,14 @@ function simulate() {
           continue;
         }
 
-        const streetName = car.streetNames[car.currentStreetIdx];
-        const { end } = dataset.streets[streetName];
+        const streetName = car.currentStreetName;
+        const { schedule, scheduledTimeWindow } = dataset.streets[streetName];
         let isTrafficLightGreen = false;
 
-        if (intersectionSchedulesById[end] && intersectionSchedulesById[end][streetName]) {
-          const timePart = time % intersectionSchedulesById[end].scheduledTimeWindow;
-          const { gte, lte } = intersectionSchedulesById[end][streetName];
+        if (schedule) {
+          const timePart = time % scheduledTimeWindow;
 
-          isTrafficLightGreen = gte <= timePart && lte >= timePart;
+          isTrafficLightGreen = schedule.gte <= timePart && schedule.lte >= timePart;
         }
 
         if (
@@ -220,11 +223,8 @@ function simulate() {
         isIntersectionCrossedInThisIteration[streetName] = true;
         dataset.streets[streetName].lastQueuingNumber = car.queuingNumber;
 
-        const { duration } = dataset.streets[
-          car.streetNames[++car.currentStreetIdx]
-        ];
-
-        car.remainingTimeOnStreet = duration;
+        car.currentStreetName = car.streetNames[++car.currentStreetIdx];
+        car.remainingTimeOnStreet = dataset.streets[car.currentStreetName].duration;
       }
     }
 

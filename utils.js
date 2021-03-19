@@ -32,18 +32,23 @@ function getMemoryUsageMessage() {
 }
 
 function elapsedTime(debug = 1) {
-  let start = new Date();
+  let start = process.hrtime.bigint();
 
   const timer = {
     log: message => {
       if (debug) {
-        console.debug(`${message && `${message}: `}${+new Date() - start} ms`);
+        const diff = process.hrtime.bigint() - start;
+
+        console.debug([
+          message && `${message}:`,
+          `${(diff / 1000000n).toLocaleString('en-US')}.${diff % 1000000n} ms`,
+        ].join(' '));
       }
 
       return timer;
     },
     reset: () => {
-      start = new Date();
+      start = process.hrtime.bigint();
       return timer;
     }
   };
